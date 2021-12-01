@@ -42,36 +42,41 @@ a.b.c.d (посторонние символы, помимо цифр и точ�
 #include <string>
 using namespace std;
 
-//функция
+//function
 bool ValidationAddresses(string szEnteredIP)
 {
+    // checking that the value consists of numbers and dots
+    bool bNotDigitsAndPoints = false;
+    for (int i = 0; i < szEnteredIP.length(); i++) {
+        if (szEnteredIP[i] != '.' && (szEnteredIP[i] < '0' || szEnteredIP[i] > '9')) bNotDigitsAndPoints = true;
+    }
 
-    //проверить наличие двух точек подряд
+    //checking double dots
     bool bDablePoints = false;
 
     for (int i = 0; i < szEnteredIP.length() - 1; i++) {
         if (szEnteredIP[i] == '.' && szEnteredIP[i + 1] == '.') bDablePoints = true;
     }
-    //проверить наличие точек в начале и конце
+    //checking dots at the beginning and end
     bool bPointsToStartAndEnd = false;
     
     if (szEnteredIP[0]== '.' || szEnteredIP[szEnteredIP.length() - 1] == '.')  bPointsToStartAndEnd = true;
 
-    //проверить наличие двух или более нолей
+    //checking double or more zero
     bool bMoreOneZero = false;
     for (int i = 0; i < szEnteredIP.length() - 1; i++) {
-        if (szEnteredIP[i] == 0 && szEnteredIP[i + 1] == 0) bMoreOneZero = true;
+        if (szEnteredIP[i] == '0' && szEnteredIP[i + 1] == '0') bMoreOneZero = true;
     }
 
-    //проверить наличие нолей перед значащей цифрой
+    //check for zero before number
     bool bZeroBeforeDigit = false;
     for (int i = 0; i < szEnteredIP.length() - 1; i++) {
-        if (szEnteredIP[i] == 0 && (szEnteredIP[i + 1] > 0 && szEnteredIP[i + 1] <= 9)) bZeroBeforeDigit = true;
+        if (szEnteredIP[i] == '0' && (szEnteredIP[i + 1] > '0' && szEnteredIP[i + 1] <= '9')) bZeroBeforeDigit = true;
     }
     
-
+    // if checking correct, moving on. Else, send "false"
     bool bIPOk = false; 
-    if (bDablePoints || bPointsToStartAndEnd || bMoreOneZero || bZeroBeforeDigit) {
+    if (bNotDigitsAndPoints || bDablePoints || bPointsToStartAndEnd || bMoreOneZero || bZeroBeforeDigit) {
         bIPOk = false;
         }
     else {
@@ -79,36 +84,23 @@ bool ValidationAddresses(string szEnteredIP)
         }
 
     if (bIPOk) {
-        string ipparth = "0";
-        for (int n = 0, i = 0; n < szEnteredIP.length(); n++) {
-            if (szEnteredIP[n] == '.' || szEnteredIP[n+1] == 0) {
-                //проверить считаное число
-                if (i == 0 && ipparth[0] >= 0 && ipparth[0] <= 9) {
-                    i = 0;
-                    ipparth = "0";
+        string ipparth;
+        for (int n = 0; n <= szEnteredIP.length(); n++) {
+            if (szEnteredIP[n] == '.' || szEnteredIP[n] == 0) {
+                //check part IP
+                if (ipparth >= "0" && ipparth <= "255") {
+                    ipparth = "";
                     continue;
                 }
-                else if (i == 1 && ipparth[0] > 0 && ipparth[0] <= 9 && ipparth[1] >= 0 && ipparth[1] <= 9) {
-                    i = 0;
-                    ipparth = "0";
-                    continue;
-                }
-                else if (i == 2 && ipparth[0] > 0 && ipparth[0] <= 2 && ipparth[1] >= 0 && ipparth[1] <= 5 && ipparth[2] >= 0 && ipparth[2] <= 5) {
-                    i = 0;
-                    ipparth = "0";
-                    continue;
-                }
+                //if part not correct, send "false"
                 else {
                     bIPOk = false;
                     break;
                 }
             }
             else {
-            // скопировать число
-                ipparth[i] = szEnteredIP[n];
-                if (szEnteredIP[n] != '.' || szEnteredIP[n + 1] != '.' || szEnteredIP[n + 1] != 0) {
-                    i++;
-                }
+                //copy char to ipparth variable 
+                ipparth += szEnteredIP[n];
             }
         }
     }
@@ -122,7 +114,7 @@ int main()
         cout << "Input IP: ";
         cin >> szEnteredIP;
 
-        if (ValidationAddresses) {
+        if (ValidationAddresses(szEnteredIP)) {
             cout << "Input IP correct." << endl;
         }
         else {
